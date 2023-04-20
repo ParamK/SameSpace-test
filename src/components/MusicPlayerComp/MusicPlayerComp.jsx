@@ -1,184 +1,277 @@
 import { useState, useRef, useEffect } from 'react';
 import './MusicPlayerComp.css';
+import AudioControls from "./AudioControls";
 import moment from 'moment';
-
+import { Slider } from 'antd';
+import VolumeIcon from '../../assets/images/volume.svg';
 
 const MusicPlayerComp = ({ songInfo, tracksGroup, songsListData, songKey }) => {
-
+    // State
+    const [trackIndex, setTrackIndex] = useState(0);
+    const [trackProgress, setTrackProgress] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [currentTime, setCurrentTime] = useState('00:00');
-    const [duration, setDuration] = useState('00:00');
-    const [songIndex, setSongIndex] = useState(0);
+    const [myAlbumInfo, setMyAlbumInfo] = useState({});
+    const [volumeVal, setVolumeVal] = useState("");
 
-    const audioRef = useRef(null);
-    const track_art_Ref = useRef(null);
-    const track_name_Ref = useRef(null);
-    const track_artist_Ref = useRef(null);
+    // Refs
+    const audioRef = useRef(new Audio(myAlbumInfo.url));
+    const intervalRef = useRef();
+    const isReady = useRef(false);
 
-    const loadTrack = (songIndex, audioRef, songsListData) => {
+    // Destructure for conciseness
+    const { duration } = audioRef.current;
+
+    const currentPercentage = duration
+        ? `${(trackProgress / duration) * 100}%`
+        : "0%";
+    const trackStyling = `
+    -webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(${currentPercentage}, #fff), color-stop(${currentPercentage}, #777))
+  `;
+
+    const startTimer = () => {
+        // Clear any timers already running
+        clearInterval(intervalRef.current);
+
+        intervalRef.current = setInterval(() => {
+            if (audioRef.current.ended) {
+                toNextTrack();
+            } else {
+                setTrackProgress(audioRef.current.currentTime);
+            }
+        }, [1000]);
+    };
+
+    const onScrub = (value) => {
+        debugger
+        // Clear any timers already running
+        clearInterval(intervalRef.current);
+        audioRef.current.currentTime = value;
+        setTrackProgress(audioRef.current.currentTime);
+    };
+
+    const onScrubEnd = () => {
+        // If not already playing, start
+        if (!isPlaying) {
+            setIsPlaying(true);
+        }
+        startTimer();
+    };
+
+    const toPrevTrack = () => {
+        debugger
+        if (trackIndex - 1 < 0) {
+            setTrackIndex(songsListData.length - 1);
+            setMyAlbumInfo(songsListData[songsListData.length - 1]);
+        } else {
+            setTrackIndex(trackIndex - 1);
+            setMyAlbumInfo(songsListData[trackIndex - 1]);
+        }
+    };
+
+    const toNextTrack = () => {
+        debugger
+        if (trackIndex < songsListData.length - 1) {
+            setTrackIndex(trackIndex + 1);
+            setMyAlbumInfo(songsListData[trackIndex + 1]);
+        } else {
+            setTrackIndex(0);
+            setMyAlbumInfo(songsListData[0]);
+        }
+    };
+
+    useEffect(() => {
         // debugger
-        if (audioRef && songsListData.length > 0) {
-            audioRef.current.src = songsListData[songIndex].url;
-            audioRef.current.load();
-
-            // Update details of the track
-            track_art_Ref.current.style.backgroundImage = "url(" + songsListData[songIndex].photo + ")";
-            track_name_Ref.current.textContent = songsListData[songIndex].title;
-            track_artist_Ref.current.textContent = songsListData[songIndex].artist;
-            // Set an interval of 1000 milliseconds for updating the seek slider
-            // updateTimer = setInterval(seekUpdate, 1000);
-
-            // Move to the next track if the current one finishes playing
-            audioRef.current.addEventListener("ended", nextTrack);
-            playTrack();
-        }
-
-        // Apply a random background color
-        // const randomColor = Math.floor(Math.random() * 16777215).toString(16);
-        // track_art_Ref.current.style.backgroundColor = "#" + randomColor;
-    }
-    const playpauseTrack = () => {
-        if (!isPlaying) playTrack();
-        else pauseTrack();
-    };
-    const playTrack = () => {
-        debugger
-        audioRef.current.play();
-        setIsPlaying(true);
-        // Replace icon with the pause icon
-        // You can use the isPlaying state to conditionally render the play/pause icon
-        // Here's an example:
-        // <i className={`fa ${isPlaying ? 'fa-pause-circle' : 'fa-play-circle'} fa-5x`}></i>
-    };
-    const pauseTrack = () => {
-        audioRef.current.pause();
-        setIsPlaying(false);
-        // Replace icon with the play icon
-    };
-
-    const nextTrack = () => {
-        debugger
-        if (songIndex < tracksGroup.length - 1) {
-            setSongIndex(songIndex + 1);
+        if (isPlaying) {
+            audioRef.current.play();
+            startTimer();
         } else {
-            setSongIndex(0);
+            audioRef.current.pause();
         }
-        loadTrack(songIndex + 1, audioRef, songsListData);
-        playTrack();
-    };
-
-    const prevTrack = () => {
-        if (songIndex > 0) {
-            setSongIndex(songIndex - 1);
-        } else {
-            setSongIndex(tracksGroup.length - 1);
-        }
-        loadTrack(songIndex - 1, audioRef, songsListData);
-        playTrack();
-    };
-
-    const seekTo = () => {
-        // handle seeking the audio track
-    };
-
-    const setVolume = () => {
-        // handle setting the volume of the audio track
-    };
-    // function resetValues() {
-    //     curr_time.textContent = "00:00";
-    //     total_duration.textContent = "00:00";
-    //     seek_slider.value = 0;
-    // }
-    // function seekUpdate() {
-    //     let seekPosition = 0;
-
-    //     // Check if the current track duration is a legible number
-    //     if (!isNaN(curr_track.duration)) {
-    //         seekPosition = curr_track.currentTime * (100 / curr_track.duration);
-    //         seek_slider.value = seekPosition;
-
-    //         // Calculate the time left and the total duration
-    //         let currentMinutes = Math.floor(curr_track.currentTime / 60);
-    //         let currentSeconds = Math.floor(curr_track.currentTime - currentMinutes * 60);
-    //         let durationMinutes = Math.floor(curr_track.duration / 60);
-    //         let durationSeconds = Math.floor(curr_track.duration - durationMinutes * 60);
-
-    //         // Adding a zero to the single digit time values
-    //         if (currentSeconds < 10) { currentSeconds = "0" + currentSeconds; }
-    //         if (durationSeconds < 10) { durationSeconds = "0" + durationSeconds; }
-    //         if (currentMinutes < 10) { currentMinutes = "0" + currentMinutes; }
-    //         if (durationMinutes < 10) { durationMinutes = "0" + durationMinutes; }
-
-    //         curr_time.textContent = currentMinutes + ":" + currentSeconds;
-    //         total_duration.textContent = durationMinutes + ":" + durationSeconds;
+    }, [isPlaying, songInfo, myAlbumInfo]);
+    // useEffect(() => {
+    //     // debugger
+    //     if (isPlaying) {
+    //         audioRef.current.play();
+    //         startTimer();
+    //     } else {
+    //         audioRef.current.pause();
     //     }
-    // }
-    const handleTimeUpdate = () => {
-        const duration = audioRef.current.duration;
-        const currentTime = audioRef.current.currentTime;
-        // setCurrentTime(moment.duration(currentTime, 'seconds').format());
-        setCurrentTime(moment.utc(currentTime * 1000).format('mm:ss'))
-        setDuration(moment.duration(duration, 'seconds').format());
-
-    };
-
-    const handleLoadedData = () => {
-        const duration = audioRef.current.duration;
-        // setCurrentTime(moment.duration(currentTime, 'seconds').format());
-        setDuration(moment.duration(duration, 'seconds').format());
-    };
-
+    // }, [isPlaying, songInfo, myAlbumInfo]);
 
     useEffect(() => {
-        setSongIndex(songKey);
-        setIsPlaying(true);
-        loadTrack(songKey, audioRef, songsListData)
-    }, [songInfo, songKey]);
-
-    useEffect(() => {
-        debugger
-        if (audioRef && songsListData.length > 0) {
-            loadTrack(songIndex, audioRef, songsListData);
-            playTrack();
+        if (isPlaying) {
+            const playPromise = audioRef.current.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    startTimer();
+                }).catch(error => {
+                    console.log(error);
+                });
+            }
+        } else {
+            audioRef.current.pause();
         }
-    }, [])
+    }, [isPlaying, songInfo, myAlbumInfo]);
+
+
+
+
+    // useEffect(() => {
+    //     const audioElement = audioRef.current;
+
+    //     function handleCanPlay() {
+    //         if (isPlaying) {
+    //             audioElement.play();
+    //             startTimer();
+    //         } else {
+    //             audioElement.pause();
+    //         }
+    //     }
+
+    //     function handlePause() {
+    //         console.log('Audio paused');
+    //     }
+
+    //     audioElement.addEventListener('canplay', handleCanPlay);
+    //     audioElement.addEventListener('pause', handlePause);
+
+    //     return () => {
+    //         audioElement.removeEventListener('canplay', handleCanPlay);
+    //         audioElement.removeEventListener('pause', handlePause);
+    //     };
+    // }, [isPlaying, songInfo, myAlbumInfo]);
+
+
+    // Handles cleanup and setup when changing songsListData
+    // useEffect(() => {
+    //     audioRef.current.pause();        
+    //     audioRef.current = new Audio(songInfo.url);
+    //     setTrackProgress(audioRef.current.currentTime);
+
+    //     if (isReady.current) {
+    //         audioRef.current.play();
+    //         setIsPlaying(true);
+    //         startTimer();
+    //     } else {
+    //         // Set the isReady ref as true for the next pass
+    //         isReady.current = true;
+    //     }
+    // }, [trackIndex, songInfo]);
+
+    useEffect(() => {
+        // debugger
+        audioRef.current.pause();
+        // console.log(songsListData[trackIndex].title);
+        // console.log(trackIndex);
+        // console.log(songInfo);
+        audioRef.current = new Audio(songInfo.url);
+        setTrackProgress(audioRef.current.currentTime);
+
+        if (isReady.current) {
+            if (audioRef.current.paused) { // check if the audio is paused before playing
+                audioRef.current.play();
+                setIsPlaying(true);
+                startTimer();
+            } else {
+                // The audio is still playing or in the process of pausing, so we wait until it has completely paused before playing it again.
+                audioRef.current.onpause = () => {
+                    audioRef.current.play();
+                    setIsPlaying(true);
+                    startTimer();
+                };
+            }
+        } else {
+            // Set the isReady ref as true for the next pass
+            isReady.current = true;
+        }
+    }, [trackIndex, songInfo]);
+
+
+    useEffect(() => {
+        // debugger
+        // Pause and clean up on unmount
+        return () => {
+            audioRef.current.pause();
+            clearInterval(intervalRef.current);
+        };
+    }, []);
+    useEffect(() => {
+        setMyAlbumInfo(songInfo);
+    }, [songInfo])
+
+    useEffect(() => {
+        // debugger
+        // console.log(songInfo);
+        if (songKey) {
+            setTrackIndex(songKey)
+        }
+        else {
+            setTrackIndex(0);
+        }
+    }, [songKey])
+
+    const onVolSliderChange = (vol) => {
+        // console.log(e);
+        console.log(vol / 100);
+        audioRef.current.volume = vol / 100;
+    }
     return (
         <>
-            {Object.keys(songInfo).length !== 0 &&
-                <div className="player">
-                    <div className="details">
-                        <div className="track-art" ref={track_art_Ref} style={{ backgroundImage: `url(${songInfo.photo})` }}></div>
-                        <div className="track-name" ref={track_name_Ref}>{songInfo.title}</div>
-                        <div className="track-artist" ref={track_artist_Ref}>{songInfo.artist}</div>
-                    </div>
-                    <div className="buttons">
-                        <div className="prev-track" onClick={prevTrack}><i className="fa fa-step-backward fa-2x"></i></div>
-                        <div className="playpause-track" onClick={playpauseTrack}>
-                            <i className={`fa ${isPlaying ? 'fa-pause-circle' : 'fa-play-circle'} fa-5x`}></i>
+            {Object.keys(myAlbumInfo).length !== 0 &&
+                <div className="audio-player">
+                    <div className="track-info">
+                        <div className="album-details">
+                            <h2 className="title">{myAlbumInfo.title}</h2>
+                            <h3 className="artist">{myAlbumInfo.artist}</h3>
                         </div>
-                        <div className="next-track" onClick={nextTrack}><i className="fa fa-step-forward fa-2x"></i></div>
-                    </div>
-                    <div className="slider_container">
-                        <div className="current-time">{currentTime}</div>
-                        <input type="range" min="1" max="100" value="0" className="seek_slider" onChange={seekTo} />
-                        <div className="total-duration">{moment.duration(songInfo.duration, 'seconds').format()}</div>
+                        <img
+                            className="artwork"
+                            src={myAlbumInfo.photo}
+                            alt={`track artwork for ${myAlbumInfo.title} by ${myAlbumInfo.artist}`}
+                        />
+                        <div className='music-seeker'>
+                            <input
+                                type="range"
+                                value={trackProgress}
+                                step="1"
+                                min="0"
+                                max={duration ? duration : `${duration}`}
+                                className="progress"
+                                onChange={(e) => onScrub(e.target.value)}
+                                onMouseUp={onScrubEnd}
+                                onKeyUp={onScrubEnd}
+                                style={{ background: trackStyling }}
+                            />
+                            {/* <Slider
+                                // defaultValue={[100]}
+                                value={trackProgress}
+                                min={1}
+                                // step={1}
+                                max={duration ? duration : `${duration}`}
+                                onChange={(e) => onScrub(e)}
+                                // onAfterChange = {(e) => onScrub(e)}
+                                onMouseUp={onScrubEnd}
+                                onKeyUp={onScrubEnd}
+                                tooltip={{ color: "red" }}
+                                // tooltipVisible={false}
+                                railStyle={{ background: '#fff', opacity: "0.2", height: '6px' }}
+                                trackStyle={{ background: '#fff', height: '6px' }}
+                            /> */}
+                        </div>
+                        <AudioControls
+                            isPlaying={isPlaying}
+                            onPrevClick={toPrevTrack}
+                            onNextClick={toNextTrack}
+                            onPlayPauseClick={setIsPlaying}
+                            onVolSliderChange={onVolSliderChange}
 
+                        />
                     </div>
-                    <div className="slider_container">
-                        <i className="fa fa-volume-down"></i>
-                        <input type="range" min="1" max="100" value="99" className="volume_slider" onChange={setVolume} />
-                        <i className="fa fa-volume-up"></i>
-                    </div>
-                    <audio
-                        ref={audioRef}
-                        src={songInfo.url}
-                        onTimeUpdate={handleTimeUpdate}
-                        onLoadedData={handleLoadedData}
-                    />
                 </div>
             }
 
         </>
+
     );
 }
 

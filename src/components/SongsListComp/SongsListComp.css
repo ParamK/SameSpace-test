@@ -1,4 +1,4 @@
-.song-wrapper{
+.song-wrapper {
     display: flex;
 }
 .songs-list-section h2 {
@@ -12,15 +12,20 @@
     color: #fff;
 }
 .songs-list-section {
-    background: red;
+    background: #001529;
     padding: 32px;
     height: 100vh;
     overflow-x: scroll;
+    flex: 0 0 50%;
+}
+.song-player-section {
+    flex: 0 0 50%;
+    height: 100vh;
 }
 .songs-list-section::-webkit-scrollbar {
     display: none;
 }
-.playlist-heading{
+.playlist-heading {
     padding: 0 16px;
 }
 .song-card {
@@ -28,7 +33,7 @@
     align-items: center;
     padding: 16px;
 }
-.song-card:focus-visible{
+.song-card:focus-visible {
     background: yellow;
 }
 .song-img {
@@ -43,4 +48,25 @@
 }
 .song-duration {
     margin-left: 1rem;
+}
+.searchInputs {
+    width: 400px;
+}
+.searchInputs .ant-input-group-addon {
+    display: none;
+}
+.searchInputs .ant-input {
+    padding: 10px 16px;
+    border-radius: 8px !important;
+    background: rgba(255, 255, 255, 0.08);
+    border: transparent;
+    color: #fff;
+    font-weight: 400;
+    font-size: 18px;
+}
+.searchInputs .ant-input::placeholder {
+    color: #ffffff;
+    opacity: 0.6;
+    font-weight: 400;
+    font-size: 18px;
 }

@@ -6,6 +6,8 @@ import './SongsListComp.css';
 import moment from 'moment';
 import 'moment-duration-format'
 import MusicPlayerComp from '../MusicPlayerComp/MusicPlayerComp';
+import { Input, Space, Button } from "antd";
+const { Search } = Input;
 
 const endpoint = 'https://api.ss.dev/resource/api'
 // const graphQLClient = new GraphQLClient(endpoint)
@@ -26,13 +28,16 @@ const GetSongsQuery = `
 const SongsListComp = ({ playListId, playListHeading }) => {
 
   const [songsListData, setSongsListData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [songInfo, setSongInfo] = useState([]);
   const [tracksGroup, setTracksGroup] = useState([]);
-  const [songKey, setSongKey] = useState(0)
+  const [songKey, setSongKey] = useState(0);
+  const [input, setInput] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     handleGetSongsList(playListId);
-    console.log(songInfo)
+    // console.log(songInfo)
   }, [playListId, playListHeading]);
 
   const handleGetSongsList = (playListId) => {
@@ -49,12 +54,14 @@ const SongsListComp = ({ playListId, playListHeading }) => {
           let responseData = response.data.data.getSongs;
           if (responseData.length > 0) {
             setSongsListData(responseData);
+            setFilteredData(responseData)
+            // console.log("songslist" + responseData)
             let tracksGroup = responseData.map((elem) => {
               return elem.url;
             })
             // console.log(tracksGroup);
             setTracksGroup(tracksGroup);
-            console.log(responseData)
+
           }
           else {
             setSongsListData([]);
@@ -64,8 +71,28 @@ const SongsListComp = ({ playListId, playListHeading }) => {
       .catch((error) => {
         setSongsListData([]);
         console.error(error)
+        setError(error);
       })
   }
+
+  //search filter starts
+  const handleFilter = (e) => {
+    debugger
+    console.log(e);
+    const searchInput = e.target.value;
+    setInput(searchInput);
+    const newFilter = songsListData.filter((value) => {
+      return value.title.toLowerCase().includes(searchInput.toLowerCase()) || value.artist.toLowerCase().includes(searchInput.toLowerCase());
+    });
+    if (searchInput === "") {
+      setFilteredData(songsListData);
+      console.log(songsListData);
+    } else {
+      setFilteredData(newFilter);
+      console.log(newFilter);
+    }
+  };
+  //search filter ends
   return (
     <React.Fragment>
       <div className="song-wrapper">
@@ -73,13 +100,21 @@ const SongsListComp = ({ playListId, playListHeading }) => {
           <div className="playlist-heading">
             <h2>{playListHeading}</h2>
           </div>
+          <div className="searchInputs">
+            <Search
+              placeholder="Search Song, Artist"
+              value={input}             
+              onChange={(e) => handleFilter(e)}
+              enterButton
+            />
+          </div>
           <ul className="song-items">
-            {songsListData.map((song, i) => {
+            {filteredData.slice(0, 10).map((song, i) => {
               return (
                 <li className="song-card" key={i}
                   onClick={() => {
                     setSongInfo(song);
-                    console.log(song);
+                    // console.log(song);
                     setSongKey(i);
                   }}>
                   <div className="song-img">
@@ -98,9 +133,12 @@ const SongsListComp = ({ playListId, playListHeading }) => {
             }
           </ul>
         </div>
-        <div className="song-player-section">
-          <MusicPlayerComp songInfo={songInfo} tracksGroup={tracksGroup} songsListData={songsListData} songKey={songKey}/>
-        </div>
+        {songsListData.length > 0 &&
+          <div className="song-player-section">
+            <MusicPlayerComp songInfo={songInfo} tracksGroup={tracksGroup} songsListData={songsListData} songKey={songKey} />
+          </div>
+        }
+
 
       </div>
 
