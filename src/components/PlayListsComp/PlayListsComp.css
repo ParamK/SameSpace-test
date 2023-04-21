@@ -1,36 +1,36 @@
-.playlist-section{
+.playlist-section {
     display: flex;
 }
-.playlist-wrapper{
+.playlist-wrapper {
     display: flex;
 }
-.playlist-wrapper .playlist-layout .ant-layout-sider{
+.playlist-wrapper .playlist-layout .ant-layout-sider {
     padding: 32px;
 }
-.playlist-wrapper .playlist-layout{
+.playlist-wrapper .playlist-layout {
     flex: 0 0 20%;
     width: 20%;
 }
-.playlist-wrapper .songs-list-layout{
+.playlist-wrapper .songs-list-layout {
     flex: 0 0 80%;
     width: 80%;
 }
-.playlist-wrapper .ant-menu-title-content{
-    color: #FFFFFF;
+.playlist-wrapper .ant-menu-title-content {
+    color: #ffffff;
     opacity: 40%;
     font-size: 20px;
 }
-.playlist-wrapper .ant-menu-item.ant-menu-item-selected{
+.playlist-wrapper .ant-menu-item.ant-menu-item-selected {
     background-color: transparent;
 }
-.playlist-wrapper .ant-menu-item{
+.playlist-wrapper .ant-menu-item {
     background-color: transparent !important;
 }
-.playlist-wrapper .ant-menu-item.ant-menu-item-selected:focus-visible{
+.playlist-wrapper .ant-menu-item.ant-menu-item-selected:focus-visible {
     outline: none;
 }
-.playlist-wrapper .ant-menu-item.ant-menu-item-selected .ant-menu-title-content{
-    color: #FFFFFF;
+.playlist-wrapper .ant-menu-item.ant-menu-item-selected .ant-menu-title-content {
+    color: #ffffff;
     font-size: 20px;
     opacity: 100%;
     background-color: transparent;
@@ -39,23 +39,38 @@
     color: #FFFFFF;
     margin-top: 30px;
 } */
-.playlist-section{
+.playlist-section {
     background: rgb(14, 10, 3);
 }
-.playlist-types .ant-tabs-tab .ant-tabs-tab-btn{
-    color: #FFFFFF;
+.playlist-types .ant-tabs-tab .ant-tabs-tab-btn {
+    color: #ffffff;
     opacity: 40%;
     font-size: 20px;
 }
-.profile-img-section{
+.profile-img-section {
     position: absolute;
     bottom: 32px;
 }
 @media screen and (max-width: 760px) {
-    .playlist-section{
+    .playlist-section {
         padding: 0;
     }
-    .playlist-wrapper .ant-layout.playlist-layout .ant-layout-sider{
-       overflow: unset;
+    .playlist-wrapper .playlist-layout {
+        flex: 1;
+        width: unset;
     }
-  }
+    .playlist-wrapper .ant-layout.playlist-layout .ant-layout-sider {
+        overflow: unset;
+    }
+}
+
+@media only screen and (max-width: 992px) and (min-width: 768px) {
+    .playlist-wrapper .playlist-layout {
+        flex: 0 0 40%;
+        width: 40%;
+    }
+    .playlist-wrapper .songs-list-layout {
+        flex: 0 0 60%;
+        width: 60%;
+    }
+}

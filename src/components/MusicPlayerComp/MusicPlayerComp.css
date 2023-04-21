@@ -36,7 +36,6 @@ input[type="range"] {
     align-items: center;
     justify-content: center;
     padding: 24px;
-    box-shadow: 0 28px 28px rgba(0, 0, 0, 0.2);
     margin: auto;
     height: 100%;
     color: var(--white);
@@ -177,5 +176,21 @@ input[type="range"]::-ms-fill-upper {
     }
     to {
         filter: hue-rotate(360deg);
+    }
+}
+
+@media screen and (max-width: 760px) {
+    .album-details{
+        text-align: center;
+    }
+    .artwork{
+        height: 150px;
+        width: 150px;
+    }
+    .audio-controls{
+        width: 100%;
+    }
+    .audio-player{
+        align-items: start;
     }
 }

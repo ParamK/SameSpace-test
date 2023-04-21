@@ -8,6 +8,9 @@ import Logo from '../../assets/images/logo.png';
 import ProfileImg from '../../assets/images/Profile.png';
 import { Radio, Space, Tabs } from 'antd';
 import { Layout, Menu, theme } from 'antd';
+import { useSelector, useDispatch } from 'react-redux'
+import { updateBgColor } from '../../features/bgColor/BgColorSlice'
+
 
 const endpoint = 'https://api.ss.dev/resource/api'
 const { Header, Content, Footer, Sider } = Layout;
@@ -25,10 +28,19 @@ const PlayListsComp = ({ playlistId }) => {
   const [playListsData, setPlayListData] = useState([]);
   const [playListId, setPlayListId] = useState(1);
   const [playListHeading, setPlayListHeading] = useState("");
+  const [BgColor, setBgColor] = useState("")
+  const bgColor = useSelector((state) => state.bgColor.value)
 
 
   useEffect(() => {
     handleGetPlaylists();
+    if (bgColor) {
+      console.log("BG COLOR " + bgColor);
+      setBgColor(bgColor);
+    }
+    else {
+      setBgColor("");
+    }
   }, []);
 
   const handleGetPlaylists = () => {
@@ -64,18 +76,15 @@ const PlayListsComp = ({ playlistId }) => {
 
   return (
     <React.Fragment>
-      <div className="playlist-section">
+      <div className="playlist-section" style={{ backgroundColor: BgColor }}>
         <div className="container">
-
           <div className="playlist-wrapper">
             <Layout className='playlist-layout'>
               <Sider
                 breakpoint="md"
                 collapsedWidth="0"
                 style={{
-                  // overflow: 'unset',
-                  // height: '100vh',
-                  // position: 'sticky',
+                  backgroundColor: BgColor,
                   left: 0,
                   top: 0,
                   bottom: 0,

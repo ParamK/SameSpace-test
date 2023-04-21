@@ -4,6 +4,10 @@ import AudioControls from "./AudioControls";
 import moment from 'moment';
 import { Slider } from 'antd';
 import VolumeIcon from '../../assets/images/volume.svg';
+import ColorThief from 'colorthief'
+import { useSelector, useDispatch } from 'react-redux'
+import { updateBgColor } from '../../features/bgColor/BgColorSlice'
+
 
 const MusicPlayerComp = ({ songInfo, tracksGroup, songsListData, songKey }) => {
     // State
@@ -11,11 +15,13 @@ const MusicPlayerComp = ({ songInfo, tracksGroup, songsListData, songKey }) => {
     const [trackProgress, setTrackProgress] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
     const [myAlbumInfo, setMyAlbumInfo] = useState({});
-    const [volumeVal, setVolumeVal] = useState("");
+    const [BgColor, setBgColor] = useState("")
+    const bgColor = useSelector((state) => state.bgColor.value)
 
     // Refs
     const audioRef = useRef(new Audio(myAlbumInfo.url));
     const intervalRef = useRef();
+    const thumbImageRef = useRef();
     const isReady = useRef(false);
 
     // Destructure for conciseness
@@ -88,15 +94,6 @@ const MusicPlayerComp = ({ songInfo, tracksGroup, songsListData, songKey }) => {
             audioRef.current.pause();
         }
     }, [isPlaying, songInfo, myAlbumInfo]);
-    // useEffect(() => {
-    //     // debugger
-    //     if (isPlaying) {
-    //         audioRef.current.play();
-    //         startTimer();
-    //     } else {
-    //         audioRef.current.pause();
-    //     }
-    // }, [isPlaying, songInfo, myAlbumInfo]);
 
     useEffect(() => {
         if (isPlaying) {
@@ -112,51 +109,6 @@ const MusicPlayerComp = ({ songInfo, tracksGroup, songsListData, songKey }) => {
             audioRef.current.pause();
         }
     }, [isPlaying, songInfo, myAlbumInfo]);
-
-
-
-
-    // useEffect(() => {
-    //     const audioElement = audioRef.current;
-
-    //     function handleCanPlay() {
-    //         if (isPlaying) {
-    //             audioElement.play();
-    //             startTimer();
-    //         } else {
-    //             audioElement.pause();
-    //         }
-    //     }
-
-    //     function handlePause() {
-    //         console.log('Audio paused');
-    //     }
-
-    //     audioElement.addEventListener('canplay', handleCanPlay);
-    //     audioElement.addEventListener('pause', handlePause);
-
-    //     return () => {
-    //         audioElement.removeEventListener('canplay', handleCanPlay);
-    //         audioElement.removeEventListener('pause', handlePause);
-    //     };
-    // }, [isPlaying, songInfo, myAlbumInfo]);
-
-
-    // Handles cleanup and setup when changing songsListData
-    // useEffect(() => {
-    //     audioRef.current.pause();        
-    //     audioRef.current = new Audio(songInfo.url);
-    //     setTrackProgress(audioRef.current.currentTime);
-
-    //     if (isReady.current) {
-    //         audioRef.current.play();
-    //         setIsPlaying(true);
-    //         startTimer();
-    //     } else {
-    //         // Set the isReady ref as true for the next pass
-    //         isReady.current = true;
-    //     }
-    // }, [trackIndex, songInfo]);
 
     useEffect(() => {
         // debugger
@@ -210,6 +162,16 @@ const MusicPlayerComp = ({ songInfo, tracksGroup, songsListData, songKey }) => {
         }
     }, [songKey])
 
+    useEffect(() => {
+        if (bgColor) {
+            console.log("BG COLOR " + bgColor);
+            setBgColor(bgColor);
+        }
+        else {
+            setBgColor("");
+        }
+    }, [])
+
     const onVolSliderChange = (vol) => {
         // console.log(e);
         console.log(vol / 100);
@@ -218,14 +180,16 @@ const MusicPlayerComp = ({ songInfo, tracksGroup, songsListData, songKey }) => {
     return (
         <>
             {Object.keys(myAlbumInfo).length !== 0 &&
-                <div className="audio-player">
+                <div className="audio-player" style={{ backgroundColor: BgColor }}>
                     <div className="track-info">
                         <div className="album-details">
                             <h2 className="title">{myAlbumInfo.title}</h2>
                             <h3 className="artist">{myAlbumInfo.artist}</h3>
                         </div>
                         <img
+                            id='album-cover-img'
                             className="artwork"
+                            ref={thumbImageRef}
                             src={myAlbumInfo.photo}
                             alt={`track artwork for ${myAlbumInfo.title} by ${myAlbumInfo.artist}`}
                         />

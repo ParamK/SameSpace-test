@@ -6,7 +6,11 @@ import './SongsListComp.css';
 import moment from 'moment';
 import 'moment-duration-format'
 import MusicPlayerComp from '../MusicPlayerComp/MusicPlayerComp';
+import { Audio, ColorRing, FidgetSpinner, Loader } from 'react-loader-spinner'
 import { Input, Space, Button } from "antd";
+import { useSelector, useDispatch } from 'react-redux'
+import { updateBgColor } from '../../features/bgColor/BgColorSlice'
+
 const { Search } = Input;
 
 const endpoint = 'https://api.ss.dev/resource/api'
@@ -34,13 +38,27 @@ const SongsListComp = ({ playListId, playListHeading }) => {
   const [songKey, setSongKey] = useState(0);
   const [input, setInput] = useState("");
   const [error, setError] = useState("");
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [BgColor, setBgColor] = useState("")
+  const bgColor = useSelector((state) => state.bgColor.value)
 
   useEffect(() => {
     handleGetSongsList(playListId);
     // console.log(songInfo)
   }, [playListId, playListHeading]);
 
+  useEffect(() => {
+    if (bgColor) {
+      console.log("BG COLOR " + bgColor);
+      setBgColor(bgColor);
+    }
+    else {
+      setBgColor("");
+    }
+  }, [])
+
   const handleGetSongsList = (playListId) => {
+    setSearchLoading(true);
     axios({
       url: endpoint,
       method: 'post',
@@ -50,6 +68,7 @@ const SongsListComp = ({ playListId, playListHeading }) => {
       }
     })
       .then((response) => {
+        setSearchLoading(false);
         if (Object.keys(response.data).length !== 0) {
           let responseData = response.data.data.getSongs;
           if (responseData.length > 0) {
@@ -65,12 +84,14 @@ const SongsListComp = ({ playListId, playListHeading }) => {
           }
           else {
             setSongsListData([]);
+            setSearchLoading(false);
           }
         }
       })
       .catch((error) => {
         setSongsListData([]);
         console.error(error)
+        setSearchLoading(false);
         setError(error);
       })
   }
@@ -78,6 +99,7 @@ const SongsListComp = ({ playListId, playListHeading }) => {
   //search filter starts
   const handleFilter = (e) => {
     debugger
+    setSearchLoading(true);
     console.log(e);
     const searchInput = e.target.value;
     setInput(searchInput);
@@ -86,55 +108,80 @@ const SongsListComp = ({ playListId, playListHeading }) => {
     });
     if (searchInput === "") {
       setFilteredData(songsListData);
+
       console.log(songsListData);
     } else {
       setFilteredData(newFilter);
       console.log(newFilter);
     }
+    setTimeout(() => {
+      setSearchLoading(false)
+    }, 1000);
   };
   //search filter ends
   return (
     <React.Fragment>
       <div className="song-wrapper">
-        <div className="songs-list-section">
+        <div className="songs-list-section"
+          style={{ backgroundColor: BgColor }}
+        >
           <div className="playlist-heading">
             <h2>{playListHeading}</h2>
           </div>
           <div className="searchInputs">
             <Search
               placeholder="Search Song, Artist"
-              value={input}             
+              value={input}
               onChange={(e) => handleFilter(e)}
+              // onSearch={(e) => console.log(e)}
+              loading
+              // onSearch={(e) => handleFilter(e)}
               enterButton
             />
           </div>
-          <ul className="song-items">
-            {filteredData.slice(0, 10).map((song, i) => {
-              return (
-                <li className="song-card" key={i}
-                  onClick={() => {
-                    setSongInfo(song);
-                    // console.log(song);
-                    setSongKey(i);
-                  }}>
-                  <div className="song-img">
-                    <img src={song.photo} alt="song-thumbnail" />
-                  </div>
-                  <div className="song-desc">
-                    <h5>{song.title}</h5>
-                    <p>{song.artist}</p>
-                  </div>
-                  <div className="song-duration">
-                    <p>{moment.duration(song.duration, 'seconds').format()}</p>
-                  </div>
-                </li>
-              )
-            })
-            }
-          </ul>
+
+          {searchLoading ?
+            <div className="loading-section">
+              <ColorRing
+                visible={true}
+                height="100"
+                width="100"
+                ariaLabel="blocks-loading"
+                wrapperStyle={{}}
+                wrapperClass="blocks-wrapper"
+                colors={['#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF',]}
+              />
+            </div>
+            :
+            <ul className="song-items">
+              {filteredData.slice(0, 10).map((song, i) => {
+                return (
+                  <li className="song-card" key={i}
+                    onClick={() => {
+                      setSongInfo(song);
+                      // console.log(song);
+                      setSongKey(i);
+                    }}>
+                    <div className="song-img">
+                      <img src={song.photo} alt="song-thumbnail" />
+                    </div>
+                    <div className="song-desc">
+                      <h5 className='mb-0'>{song.title}</h5>
+                      <p className='mb-0'>{song.artist}</p>
+                    </div>
+                    <div className="song-duration">
+                      <p className='mb-0'>{moment.duration(song.duration, 'seconds').format()}</p>
+                    </div>
+                  </li>
+                )
+              })
+              }
+            </ul>
+          }
+
         </div>
         {songsListData.length > 0 &&
-          <div className="song-player-section">
+          <div className="song-player-section" style={{ backgroundColor: BgColor }}>
             <MusicPlayerComp songInfo={songInfo} tracksGroup={tracksGroup} songsListData={songsListData} songKey={songKey} />
           </div>
         }
