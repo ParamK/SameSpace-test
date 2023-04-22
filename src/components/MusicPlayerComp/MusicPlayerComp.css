@@ -106,19 +106,23 @@ input[type="range"] {
 .color-backdrop.playing {
     animation: colorChange 20s alternate infinite;
 }
-.options{
+.options {
     width: 48px;
     height: 48px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 72px;
 }
-.prev,.next{
+.prev,
+.next {
     opacity: 70%;
 }
-.prev:hover,.next:hover{
+.prev:hover,
+.next:hover {
     opacity: 100%;
 }
-.play:hover,.pause:hover,.volume-section:hover{
+.play:hover,
+.pause:hover,
+.volume-section:hover {
     opacity: 80%;
 }
 .volume-section {
@@ -161,13 +165,13 @@ input[type="range"]::-ms-fill-upper {
     background: #ddd;
     border-radius: 10px;
 }
-.music-seeker{
+.music-seeker {
     margin-top: 24px;
 }
 .music-seeker .ant-slider-handle {
     opacity: 0;
 }
-.music-seeker .ant-tooltip .ant-tooltip-inner{
+.music-seeker .ant-tooltip .ant-tooltip-inner {
     color: transparent;
 }
 @keyframes colorChange {
@@ -178,19 +182,76 @@ input[type="range"]::-ms-fill-upper {
         filter: hue-rotate(360deg);
     }
 }
-
-@media screen and (max-width: 760px) {
-    .album-details{
-        text-align: center;
+@media screen and (max-width: 1199px) {
+    .songs-list-section{
+        padding: 0;
     }
     .artwork{
+        width: 300px;
+        height: 300px;
+    }
+    .playlist-heading {
+        text-align: center;
+    }
+    .searchInputs .ant-input {
+        font-size: 16px;
+    }
+    .searchInputs .ant-input::placeholder {
+        font-size: 16px;
+        text-align: center;
+    }
+    .song-desc h5 {
+        font-size: 16px;
+    }
+    .song-desc p {
+        font-size: 12px;
+    }
+    .song-duration {
+        right: 18px;
+    }
+    .song-duration p {
+        font-size: 12px;
+    }
+}
+@media screen and (max-width: 992px) {
+    .playlist-heading {
+        text-align: center;
+    }
+    .searchInputs .ant-input {
+        font-size: 16px;
+    }
+    .searchInputs .ant-input::placeholder {
+        font-size: 16px;
+        text-align: center;
+    }
+    .song-desc h5 {
+        font-size: 16px;
+    }
+    .song-desc p {
+        font-size: 12px;
+    }
+    .song-duration {
+        right: 18px;
+    }
+    .song-duration p {
+        font-size: 12px;
+    }
+    .audio-player {
+        align-items: start;
+    }
+}
+@media screen and (max-width: 768px) {
+    .album-details {
+        text-align: center;
+    }
+    .artwork {
         height: 150px;
         width: 150px;
     }
-    .audio-controls{
+    .audio-controls {
         width: 100%;
     }
-    .audio-player{
+    .audio-player {
         align-items: start;
     }
 }

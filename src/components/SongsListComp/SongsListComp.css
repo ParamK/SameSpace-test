@@ -36,25 +36,19 @@
 .song-card {
     display: flex;
     align-items: center;
-    border: 1px solid transparent;
-    background: rgb(37, 42, 52);
     border-radius: 8px;
     padding: 16px;
     margin: 16px 0;
     position: relative;
 }
 .song-card:hover {
-    background: #ffffff;
-    color: #000000;
+    border: 1px solid transparent;
+    background: rgb(37, 42, 52);
     transition: background 0.5s ease-out;
     cursor: pointer;
 }
-.song-card:active {
+.song-card-selected{
     background: red;
-    transition: none;
-}
-.song-card:focus-visible {
-    background: yellow;
 }
 .song-img {
     width: 48px;
@@ -108,19 +102,27 @@
     font-weight: 400;
     font-size: 18px;
 }
+@media screen and (max-width: 1199px) {
+    .song-player-section {
+        flex: 0 0 40%;
+    }
+    .songs-list-section {
+        flex: 0 0 50%;
+    }
+}
 
-@media screen and (max-width: 575px) and (min-width: 360px) {
+@media screen and (max-width: 992px) {
+    .song-wrapper {
+        flex-direction: column;
+    }
+    .song-player-section {
+        flex: unset;
+    }
     .playlist-heading {
         text-align: center;
     }
-    .songs-list-section {
-        flex: 0 0 100%;
-        padding: 10px;
-        border-bottom: 3px solid #fff;
-        height: 36vh;
-    }
-    .song-player-section {
-        flex: 0 0 100%;
+    .searchInputs i {
+        position: absolute;
     }
     .searchInputs .ant-input {
         font-size: 16px;
@@ -129,9 +131,39 @@
         font-size: 16px;
         text-align: center;
     }
-    .song-img {
-        width: 30px;
-        height: 30px;
+    .song-desc h5 {
+        font-size: 16px;
+    }
+    .song-desc p {
+        font-size: 12px;
+    }
+    .song-duration {
+        right: 18px;
+    }
+    .song-duration p {
+        font-size: 12px;
+    }
+    .audio-player {
+        align-items: start;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .songs-list-section {
+        flex: 1;
+    }
+    .song-player-section {
+        flex: 1;
+    }
+    .playlist-heading {
+        text-align: center;
+    }
+    .searchInputs .ant-input {
+        font-size: 16px;
+    }
+    .searchInputs .ant-input::placeholder {
+        font-size: 16px;
+        text-align: center;
     }
     .song-desc h5 {
         font-size: 16px;
@@ -146,8 +178,10 @@
         font-size: 12px;
     }
 }
-
-@media screen and (max-width: 768px) and (min-width: 576px) {
+@media screen and (max-width: 576px) {
+    .song-wrapper {
+        flex-direction: unset;
+    }
     .playlist-heading {
         text-align: center;
     }
@@ -155,7 +189,7 @@
         flex: 0 0 100%;
         padding: 10px;
         border-bottom: 3px solid #fff;
-        height: 55vh;
+        height: 36vh;
     }
     .song-player-section {
         flex: 0 0 100%;

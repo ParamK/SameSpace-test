@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useQuery } from 'react-query';
 import { GraphQLClient } from 'graphql-request'
@@ -12,6 +12,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { updateBgColor } from '../../features/bgColor/BgColorSlice'
 
 const { Search } = Input;
+
 
 const endpoint = 'https://api.ss.dev/resource/api'
 // const graphQLClient = new GraphQLClient(endpoint)
@@ -41,6 +42,7 @@ const SongsListComp = ({ playListId, playListHeading }) => {
   const [searchLoading, setSearchLoading] = useState(false);
   const [BgColor, setBgColor] = useState("")
   const bgColor = useSelector((state) => state.bgColor.value)
+  const [cardSelected, setCardSelected] = useState(false);
 
   useEffect(() => {
     handleGetSongsList(playListId);
@@ -156,10 +158,11 @@ const SongsListComp = ({ playListId, playListHeading }) => {
             <ul className="song-items">
               {filteredData.slice(0, 10).map((song, i) => {
                 return (
-                  <li className="song-card" key={i}
+                  <li
+                    className="song-card"
+                    key={i}
                     onClick={() => {
                       setSongInfo(song);
-                      // console.log(song);
                       setSongKey(i);
                     }}>
                     <div className="song-img">
