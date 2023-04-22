@@ -151,12 +151,7 @@ input[type="range"] {
     transition: background 0.2s ease;
     cursor: pointer;
 }
-/* input[type="range"]::-webkit-slider-runnable-track {
-    width: 300px;
-    height: 5px;
-    background: red;
-    border: none;
-} */
+
 input[type="range"]::-ms-fill-lower {
     background: #777;
     border-radius: 10px;

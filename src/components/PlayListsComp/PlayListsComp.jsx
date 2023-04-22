@@ -49,17 +49,14 @@ const PlayListsComp = ({ playlistId }) => {
       method: 'post',
       data: {
         query: GetPlayListsQuery,
-        // variables: { playlistId: 1 }
       }
     })
       .then((response) => {
         if (Object.keys(response.data).length !== 0) {
           let responseData = response.data.data.getPlaylists;
-          // console.log(responseData);
           if (responseData.length > 0) {
             setPlayListData(responseData);
             setPlayListHeading(responseData[0].title);
-            // console.log(responseData[0].title)
           }
           else {
             setPlayListData([]);
@@ -102,14 +99,12 @@ const PlayListsComp = ({ playlistId }) => {
                   className='mt-4'
                   defaultSelectedKeys="1"
                   onClick={(e) => {
-                    // console.log(playListsData[e.key-1].title);
                     setPlayListHeading(playListsData[e.key - 1].title);
                     setPlayListId(e.key);
                   }}
                   items={playListsData.map((elem, i) => {
                     return {
                       label: `${elem.title}`,
-                      // icon: React.createElement(elem),
                       key: `${elem.id}`,
                     };
                   })}
@@ -122,18 +117,6 @@ const PlayListsComp = ({ playlistId }) => {
             <Layout className='songs-list-layout'>
               <SongsListComp playListId={playListId} playListHeading={playListHeading} />
             </Layout>
-            {/* <div className="playlist-types">
-              <Tabs
-                tabPosition="left"
-                items={playListsData.map((elem, i) => {
-                  return {
-                    label: `${elem.title}`,
-                    key: `${elem.id}`,
-                    children: <SongsListComp playListId={elem.id} playListHeading={elem.title} />,
-                  };
-                })}
-              />
-            </div> */}
           </div>
 
         </div>

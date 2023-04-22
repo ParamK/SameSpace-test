@@ -24,7 +24,7 @@ const MusicPlayerComp = ({ songInfo, tracksGroup, songsListData, songKey }) => {
     const thumbImageRef = useRef();
     const isReady = useRef(false);
 
-    // Destructure for conciseness
+
     const { duration } = audioRef.current;
 
     const currentPercentage = duration
@@ -34,8 +34,86 @@ const MusicPlayerComp = ({ songInfo, tracksGroup, songsListData, songKey }) => {
     -webkit-gradient(linear, 0% 0%, 100% 0%, color-stop(${currentPercentage}, #fff), color-stop(${currentPercentage}, #777))
   `;
 
+
+    useEffect(() => {
+        if (isPlaying) {
+            audioRef.current.play();
+            startTimer();
+        } else {
+            audioRef.current.pause();
+        }
+    }, [isPlaying, songInfo, myAlbumInfo]);
+
+    useEffect(() => {
+        if (isPlaying) {
+            const playPromise = audioRef.current.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    startTimer();
+                }).catch(error => {
+                    console.log(error);
+                });
+            }
+        } else {
+            audioRef.current.pause();
+        }
+    }, [isPlaying, songInfo, myAlbumInfo]);
+
+    useEffect(() => {
+        audioRef.current.pause();
+        audioRef.current = new Audio(songInfo.url);
+        setTrackProgress(audioRef.current.currentTime);
+
+        if (isReady.current) {
+            if (audioRef.current.paused) { // check if the audio is paused before playing
+                audioRef.current.play();
+                setIsPlaying(true);
+                startTimer();
+            } else {
+                // The audio is still playing or in the process of pausing, so we wait until it has completely paused before playing it again.
+                audioRef.current.onpause = () => {
+                    audioRef.current.play();
+                    setIsPlaying(true);
+                    startTimer();
+                };
+            }
+        } else {
+            // Set the isReady ref as true for the next pass
+            isReady.current = true;
+        }
+    }, [trackIndex, songInfo]);
+
+
+    useEffect(() => {
+        return () => {
+            audioRef.current.pause();
+            clearInterval(intervalRef.current);
+        };
+    }, []);
+    useEffect(() => {
+        setMyAlbumInfo(songInfo);
+    }, [songInfo])
+
+    useEffect(() => {
+        if (songKey) {
+            setTrackIndex(songKey)
+        }
+        else {
+            setTrackIndex(0);
+        }
+    }, [songKey])
+
+    useEffect(() => {
+        if (bgColor) {
+            console.log("BG COLOR " + bgColor);
+            setBgColor(bgColor);
+        }
+        else {
+            setBgColor("");
+        }
+    }, [])
+
     const startTimer = () => {
-        // Clear any timers already running
         clearInterval(intervalRef.current);
 
         intervalRef.current = setInterval(() => {
@@ -49,14 +127,12 @@ const MusicPlayerComp = ({ songInfo, tracksGroup, songsListData, songKey }) => {
 
     const onScrub = (value) => {
         debugger
-        // Clear any timers already running
         clearInterval(intervalRef.current);
         audioRef.current.currentTime = value;
         setTrackProgress(audioRef.current.currentTime);
     };
 
     const onScrubEnd = () => {
-        // If not already playing, start
         if (!isPlaying) {
             setIsPlaying(true);
         }
@@ -85,95 +161,8 @@ const MusicPlayerComp = ({ songInfo, tracksGroup, songsListData, songKey }) => {
         }
     };
 
-    useEffect(() => {
-        // debugger
-        if (isPlaying) {
-            audioRef.current.play();
-            startTimer();
-        } else {
-            audioRef.current.pause();
-        }
-    }, [isPlaying, songInfo, myAlbumInfo]);
-
-    useEffect(() => {
-        if (isPlaying) {
-            const playPromise = audioRef.current.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    startTimer();
-                }).catch(error => {
-                    console.log(error);
-                });
-            }
-        } else {
-            audioRef.current.pause();
-        }
-    }, [isPlaying, songInfo, myAlbumInfo]);
-
-    useEffect(() => {
-        // debugger
-        audioRef.current.pause();
-        // console.log(songsListData[trackIndex].title);
-        // console.log(trackIndex);
-        // console.log(songInfo);
-        audioRef.current = new Audio(songInfo.url);
-        setTrackProgress(audioRef.current.currentTime);
-
-        if (isReady.current) {
-            if (audioRef.current.paused) { // check if the audio is paused before playing
-                audioRef.current.play();
-                setIsPlaying(true);
-                startTimer();
-            } else {
-                // The audio is still playing or in the process of pausing, so we wait until it has completely paused before playing it again.
-                audioRef.current.onpause = () => {
-                    audioRef.current.play();
-                    setIsPlaying(true);
-                    startTimer();
-                };
-            }
-        } else {
-            // Set the isReady ref as true for the next pass
-            isReady.current = true;
-        }
-    }, [trackIndex, songInfo]);
-
-
-    useEffect(() => {
-        // debugger
-        // Pause and clean up on unmount
-        return () => {
-            audioRef.current.pause();
-            clearInterval(intervalRef.current);
-        };
-    }, []);
-    useEffect(() => {
-        setMyAlbumInfo(songInfo);
-    }, [songInfo])
-
-    useEffect(() => {
-        // debugger
-        // console.log(songInfo);
-        if (songKey) {
-            setTrackIndex(songKey)
-        }
-        else {
-            setTrackIndex(0);
-        }
-    }, [songKey])
-
-    useEffect(() => {
-        if (bgColor) {
-            console.log("BG COLOR " + bgColor);
-            setBgColor(bgColor);
-        }
-        else {
-            setBgColor("");
-        }
-    }, [])
 
     const onVolSliderChange = (vol) => {
-        // console.log(e);
         console.log(vol / 100);
         audioRef.current.volume = vol / 100;
     }
@@ -206,21 +195,6 @@ const MusicPlayerComp = ({ songInfo, tracksGroup, songsListData, songKey }) => {
                                 onKeyUp={onScrubEnd}
                                 style={{ background: trackStyling }}
                             />
-                            {/* <Slider
-                                // defaultValue={[100]}
-                                value={trackProgress}
-                                min={1}
-                                // step={1}
-                                max={duration ? duration : `${duration}`}
-                                onChange={(e) => onScrub(e)}
-                                // onAfterChange = {(e) => onScrub(e)}
-                                onMouseUp={onScrubEnd}
-                                onKeyUp={onScrubEnd}
-                                tooltip={{ color: "red" }}
-                                // tooltipVisible={false}
-                                railStyle={{ background: '#fff', opacity: "0.2", height: '6px' }}
-                                trackStyle={{ background: '#fff', height: '6px' }}
-                            /> */}
                         </div>
                         <AudioControls
                             isPlaying={isPlaying}
@@ -228,7 +202,6 @@ const MusicPlayerComp = ({ songInfo, tracksGroup, songsListData, songKey }) => {
                             onNextClick={toNextTrack}
                             onPlayPauseClick={setIsPlaying}
                             onVolSliderChange={onVolSliderChange}
-
                         />
                     </div>
                 </div>

@@ -15,7 +15,6 @@ const { Search } = Input;
 
 
 const endpoint = 'https://api.ss.dev/resource/api'
-// const graphQLClient = new GraphQLClient(endpoint)
 
 const GetSongsQuery = `
   query GetSongs($playlistId: Int!) {
@@ -46,7 +45,6 @@ const SongsListComp = ({ playListId, playListHeading }) => {
 
   useEffect(() => {
     handleGetSongsList(playListId);
-    // console.log(songInfo)
   }, [playListId, playListHeading]);
 
   useEffect(() => {
@@ -76,11 +74,9 @@ const SongsListComp = ({ playListId, playListHeading }) => {
           if (responseData.length > 0) {
             setSongsListData(responseData);
             setFilteredData(responseData)
-            // console.log("songslist" + responseData)
             let tracksGroup = responseData.map((elem) => {
               return elem.url;
             })
-            // console.log(tracksGroup);
             setTracksGroup(tracksGroup);
 
           }
@@ -135,9 +131,7 @@ const SongsListComp = ({ playListId, playListHeading }) => {
               placeholder="Search Song, Artist"
               value={input}
               onChange={(e) => handleFilter(e)}
-              // onSearch={(e) => console.log(e)}
               loading
-              // onSearch={(e) => handleFilter(e)}
               enterButton
             />
           </div>
